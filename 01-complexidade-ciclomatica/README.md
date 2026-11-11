@@ -17,3 +17,11 @@ O arquivo `src/calcularDesconto.js` possui uma função com múltiplos `ifs` ani
 npm install
 npm test
 ```
+
+## ✅ Solução
+
+- As regras saíram dos `ifs` aninhados para a tabela `REGRAS_DE_DESCONTO` (um `Map` de tipo de cliente → lista de `{ aplica, taxa }`).
+- A função apenas busca as regras do tipo e usa a primeira que se aplica: `regras.find(...)`. Sem aninhamento, com um único nível de indentação.
+- Novo tipo de cliente ou nova faixa = nova linha na tabela, sem mexer na função.
+- O `Map` evita que tipos como `"toString"` encontrem propriedades herdadas de `Object`.
+- `tests/regrasDeDesconto.test.js` cobre todas as faixas e limites (500, 1000, 5 anos). Esses testes passam tanto na versão original quanto na refatorada, o que confirma que o comportamento não mudou.

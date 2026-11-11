@@ -17,3 +17,18 @@ O arquivo `src/SistemaDeVendas.js` é um exemplo de **Script Monolítico** ou "O
 npm install
 npm test
 ```
+
+## ✅ Solução
+
+| Classe | Responsabilidade (SRP) |
+| --- | --- |
+| `ValidadorDePedido` | Validar se o pedido tem itens |
+| `CalculadoraDeTotal` | Somar os itens e aplicar 10% de desconto acima de 1000 |
+| `VendasRepository` | Persistir a venda (infraestrutura, simulada) |
+| `NotificadorService` | Avisar o cliente por e-mail (infraestrutura, simulada) |
+| `ProcessadorDeVendas` | Orquestrar a venda: validar → calcular → salvar → notificar |
+| `SistemaDeVendas` | *Composition Root*: monta o processador com as implementações concretas |
+
+- **DIP:** o `ProcessadorDeVendas` não cria nenhuma dependência. Ele recebe tudo pelo construtor e conhece só os métodos (`validar`, `calcular`, `salvar`, `notificar`). Trocar o banco ou o e-mail não exige alterar o orquestrador.
+- `SistemaDeVendas` é o único ponto que escolhe as classes concretas. Por isso o teste original (`new SistemaDeVendas()`) continua passando sem alterações.
+- **Testabilidade:** `tests/ProcessadorDeVendas.test.js` testa o orquestrador com dublês (`jest.fn()`) no lugar do banco e do e-mail, e confere que um pedido inválido não é salvo nem notificado.

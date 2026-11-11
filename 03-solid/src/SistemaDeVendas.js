@@ -1,15 +1,22 @@
-class SistemaDeVendas {
-  async processarVenda(pedido) {
-    if (!pedido.itens || pedido.itens.length === 0) throw new Error("Pedido sem itens");
-    
-    let total = 0;
-    for (const item of pedido.itens) total += item.preco * item.quantidade;
-    if (total > 1000) total *= 0.9;
+const ProcessadorDeVendas = require("./ProcessadorDeVendas");
+const ValidadorDePedido = require("./ValidadorDePedido");
+const CalculadoraDeTotal = require("./CalculadoraDeTotal");
+const VendasRepository = require("./VendasRepository");
+const NotificadorService = require("./NotificadorService");
 
-    console.log(`Salvando pedido ${pedido.id}...`);
-    console.log(`Enviando e-mail para ${pedido.clienteEmail}...`);
-    
-    return { ...pedido, total, status: "pago" };
+// Composition Root: único ponto do sistema que escolhe as
+// implementações concretas e as injeta no orquestrador.
+// O ProcessadorDeVendas continua sem conhecer nenhuma delas.
+// Dependências passadas aqui substituem as padrão.
+class SistemaDeVendas extends ProcessadorDeVendas {
+  constructor(dependencias = {}) {
+    super({
+      validador: new ValidadorDePedido(),
+      calculadora: new CalculadoraDeTotal(),
+      repositorio: new VendasRepository(),
+      notificador: new NotificadorService(),
+      ...dependencias,
+    });
   }
 }
 
